@@ -1,17 +1,33 @@
-//lens cap
-threadHeight = 3;    // height of "threaded" part (smaller cylinder)
-topHeight = 4;       // height of "cap" part
-springHeight = 2;    // height of springs
-gap = 1;             // clearance 
-wall = 1.5;          // wall thickness
-springY=15;          //size of spring in y direction.
+// Parametric lens cap
+
+// Height of "threaded" part (smaller cylinder)
+threadHeight = 3;    
+// Height of "cap" part
+topHeight = 4;       
+// Height of springs
+springHeight = 2;    
+// Clearance 
+gap = 1;             
+// Wall thickness
+wall = 1.5;          
+// Size of springs in y direction.
+springY = 15;          
+// Thickness of springs
 springThickness = 2;
-travel = 2;          //distance the clip will stick out past the lens
-diameter = 76;       // For a 77mm lens this seems to work
+// Distance the clip will stick out past the lens
+travel = 2;
+// Lenscap diameter. On my printer setting to 76 works well for a 77mm lens
+diameter = 76;
+// Lenscap outer diameter.
 capDiameter = 80;
-holeDiameter = 6;    // size of holes for studs
-numStuds = 3;        // 3 or 2 are supported
-part = 0;            // set to 1, 2, or 3 to generate stl for whichever part you wanted
+// Size of holes for studs
+holeDiameter = 6;
+// Number of studs
+numStuds = 3;        // [2,3]
+// Which part do you want? Note that selecing combined will generate unprintable stl
+// part = 0;            // [0:all,1:top,2:springs,3:caps,4:combined]
+// How far apart do you want the parts in the stl
+partSpacing = 10;
 
 lensRadius = diameter/2; 
 overhang = (capDiameter - diameter)/2;
@@ -23,9 +39,10 @@ springWidth=(lensRadius-springLength)/2-springThickness-gap;
 // Total height is topHeight + threadHeight
 // Clearance for glass is topHeight - (gap + springHeight)
 
-$fs = 0.5;
-$fn = 0;
-$fa = 0.01;
+// Circle smoothness - expressed as *1 to hide them from customizer
+$fs = 0.5 *1;
+$fn = 0 *1;
+$fa = 0.01 *1;
 
 module spring()
 {
@@ -211,11 +228,32 @@ module crossSection(){
 	}
 }
 
+/*
 mirror([0,0,1]) {
-  if (part==0 || part==1)
+  if (part==0)
+  {
+    translate([0,0,0]) lensCapTop();
+    translate([capDiameter/2+channelWidth/2+partSpacing,0,springBase]) lensCapBase1();
+    translate([0,capDiameter/2+channelWidth/2+partSpacing,0]) rotate([0,0,90]) lensCapBase2();
+  }
+  else if (part==4)
+  {
     lensCapTop();
-  if (part==0 || part==2)
     lensCapBase1();
-  if (part==0 || part==3)
     lensCapBase2();
+  }
+  else if (part==1)
+    lensCapTop();
+  else if (part==2)
+    lensCapBase1();
+  else if (part==3)
+    lensCapBase2();
+}
+*/
+
+mirror([0,0,1]) 
+{
+    translate([0,0,0]) lensCapTop();
+    translate([capDiameter/2+channelWidth/2+partSpacing,0,springBase]) lensCapBase1();
+    translate([0,capDiameter/2+channelWidth/2+partSpacing,0]) rotate([0,0,90]) lensCapBase2();
 }
