@@ -23,13 +23,13 @@ M906 X800 Y1000 Z800 E1000          ; Set motor currents (mA)
 M569 P0 S0                          ; Reverse the X motor
 M92 E430                            ; Set extruder steps per mm
 M558 P2                             ; Use a modulated Z probe
-G31 Z2.1 P662                       ; Set the probe height and threshold
+G31 Z2.0 P660                       ; Set the probe height and threshold
 M557 P0 X55 Y0                      ; Four... 
 M557 P1 X55 Y180                    ; ...probe points...
 M557 P2 X215 Y180                   ; ...for bed...
 M557 P3 X215 Y0                     ; ...levelling
 ;xy
-M556 S78 X0 Y-1.0 Z-1.25            ; Put your axis compensation here
+;M556 S78 X0 Y-1.0 Z-1.25            ; Put your axis compensation here
 M201 X500 Y500 Z15 E500             ; Accelerations (mm/s^2)
 M203 X15000 Y15000 Z100 E3600       ; Maximum speeds (mm/min)
 M566 X1200 Y1200 Z30 E1200          ; Minimum speeds mm/minute
