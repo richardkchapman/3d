@@ -7,7 +7,9 @@ topHeight = 4;
 // Height of springs
 springHeight = 2;    
 // Clearance 
-gap = 1;             
+gap = 0.5;             
+// Stud clearance 
+studClearance = 0.1;             
 // Wall thickness
 wall = 1.5;          
 // Size of springs in y direction.
@@ -179,8 +181,8 @@ module stud()
   {
     union()
     {
-      translate([0,0,springHeight*1/3]) cylinder(r=holeDiameter/2 - 0.25,h=springHeight*2/3);
-      cylinder(r2=holeDiameter/2 + 0.25,r=holeDiameter/2 - 0.25,h=springHeight*1/3);
+      translate([0,0,springHeight*1/3]) cylinder(r=holeDiameter/2 - studClearance, h=springHeight);
+      cylinder(r2=holeDiameter/2 + 0.25,r=holeDiameter/2 - studClearance, h=springHeight*1/3);
     }
     translate([0,0,springHeight/2]) cube([1.5,8,springHeight],true);
   }
