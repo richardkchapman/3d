@@ -33,6 +33,13 @@ M557 P3 X215 Y0                     ; ...levelling
 M201 X500 Y500 Z15 E500             ; Accelerations (mm/s^2)
 M203 X15000 Y15000 Z100 E3600       ; Maximum speeds (mm/min)
 M566 X1200 Y1200 Z30 E1200          ; Minimum speeds mm/minute
+;
+; Added second extruder
+;
+M563 P127 H1 D0:1:2:3:4             ; Tool 127 allows the web interface to control all drives and heaters
+M305 P1 R4700                       ; Set the first hot end thermistor series resistor to 4K7
+M305 P2 R4700                       ; Set the second hot end thermistor series resistor to 4K7
 M563 P1 D0 H1                       ; Define tool 1
 G10 P1 S-273 R-273                  ; Set tool 1 operating and standby temperatures
-
+M563 P2 D1 H2                       ; Define tool 2
+G10 P2 X19 S-273 R-273              ; Set tool 2 temperatures, and X offset from the first nozzle tip
