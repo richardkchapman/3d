@@ -44,4 +44,3 @@ G10 P1 S-273 R-273                  ; Set tool 1 operating and standby temperatu
 M563 P2 D1 H2                       ; Define tool 2
 G10 P2 X19 S-273 R-273              ; Set tool 2 temperatures, and X offset from the first nozzle tip
 ;
-T1                                  ; Select tool 1
