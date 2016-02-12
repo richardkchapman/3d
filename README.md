@@ -1,4 +1,4 @@
 3d
 ==
 
-Various stuff related to 3d printing.
+Various stuff related to 3d printing
