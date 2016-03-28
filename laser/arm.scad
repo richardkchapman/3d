@@ -14,6 +14,7 @@ d1 = 55;
 base = 2;
 sensor = 20;  // Make it oversize so we can use ground-glass focussing screen
 fudge = 1;
+hingeTol = 0.2;
 
 module arm()
 {
@@ -60,7 +61,7 @@ module laserMount()
     difference()
     {
       cylinder(h=20,r=5);
-      cylinder(h=21,r=3.25);
+      cylinder(h=21,r=3.3);  // Shouldq be 6.5/2 but holes seem to print smaller than you ask
     }
 }
 
@@ -69,8 +70,9 @@ module laserMount()
     difference()
     {
       bar();
-      translate([w/5,w-h,0]) cube([w/5,h,h]);
-      translate([3*w/5,w-h,0]) cube([w/5,h,h]);
+      // hinge tabs
+      translate([w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+      translate([3*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
       translate([0,w-h/2,h/2])
         rotate([0,90,0])
           cylinder(h=fullWidth,r=pin/2);
@@ -79,12 +81,12 @@ module laserMount()
       translate([w/2,-l,0])
         cylinder(h,r=2);
     }
-    // Wire retaining tabs
-    translate([w/2,-10,0]) cube([3,2,1]);
+    // Wire retaining tabs - not worth it
+/*    translate([w/2,-10,0]) cube([3,2,1]);
     translate([w/2-3,-(l-20)/4-10,0]) cube([3,2,1]);
     translate([w/2,-l/2]) cube([3,2,1]);
     translate([w/2-3,-3*(l-20)/4-10,0]) cube([3,2,1]);
-    translate([w/2,-l+10,0]) cube([3,2,1]);
+    translate([w/2,-l+10,0]) cube([3,2,1]); */
     laserMount();
   }
 }
@@ -123,9 +125,9 @@ module hinge()
         }
       }
     }
-    translate([0*w/5,w-h,0]) cube([w/5,h,h]);
-    translate([2*w/5,w-h,0]) cube([w/5,h,h]);
-    translate([4*w/5,w-h,0]) cube([w/5,h,h]);
+    translate([0*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+    translate([2*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+    translate([4*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
     translate([0,w-h/2,h/2])
       rotate([0,90,0])
         cylinder(h=fullWidth,r=pin/2);
@@ -200,7 +202,13 @@ module mount()
   }
 }
 
-arm();
+intersection()
+{
+  arm();
+  translate([-w/2,-w,0]) cube([w,w,h]);
+}
+translate([w+h,-w/2,0])
+  hinge();
 //sensor();
 //mount();
 
