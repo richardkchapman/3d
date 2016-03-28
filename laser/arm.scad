@@ -8,7 +8,7 @@ h = 8;
 l = 180;
 pin=4;
 flange = 44;
-etube = 10;
+etube = 0;
 d2 = 65;
 d1 = 55;
 base = 2;
@@ -91,7 +91,7 @@ module laserMount()
   }
 }
 
-module hinge()
+module hinge(pins=2)
 {
   translate([-w/2,-w/2,0]) difference()
   {
@@ -125,9 +125,15 @@ module hinge()
         }
       }
     }
-    translate([0*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
-    translate([2*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
-    translate([4*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+    if (pins==2)
+    {
+      translate([0*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+      translate([2*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+      translate([4*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+    } else {
+      translate([1*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+      translate([3*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+    }
     translate([0,w-h/2,h/2])
       rotate([0,90,0])
         cylinder(h=fullWidth,r=pin/2);
@@ -173,7 +179,7 @@ module sensor()
       translate([w/2-4,d2+w*2.5-4,0]) cylinder(h,r=2);
     }
     // Hinge for tripod mount
-    translate([-d2/2-w/4,d2/2+w/4,0]) rotate([0,0,90]) hinge();
+    translate([-d2/2-w/4,d2/2+w/4,0]) rotate([0,0,90]) hinge(pins=3);
     translate([0,w/4+d2/2,0]) 
       difference()
       {
@@ -202,14 +208,8 @@ module mount()
   }
 }
 
-intersection()
-{
-  arm();
-  translate([-w/2,-w,0]) cube([w,w,h]);
-}
-translate([w+h,-w/2,0])
-  hinge();
-//sensor();
+//  arm();
+sensor();
 //mount();
 
 //Draw a prism based on a 
