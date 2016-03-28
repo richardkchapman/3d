@@ -12,7 +12,7 @@ etube = 10;
 d2 = 65;
 d1 = 55;
 base = 2;
-sensor = 5;
+sensor = 20;  // Make it oversize so we can use ground-glass focussing screen
 fudge = 1;
 
 module arm()
@@ -37,15 +37,15 @@ module bar()
         cube([fullWidth,l+fullWidth*2,h]);
       difference()
       {
-        translate([0,fullWidth-h/2,h/2])
-          cube([fullWidth,h/2,h/2]);
+        translate([0,fullWidth-h/2,0])
+          cube([fullWidth,h/2,h]);
         difference()
         {
           translate([0,fullWidth-h/2,h/2])
             rotate([0,90,0])
               cylinder(h=fullWidth,r=h/2);
-          translate([0,0,0])
-            cube([fullWidth,fullWidth,h/2]);
+     //     translate([0,0,0])
+       //     cube([fullWidth,fullWidth,h/2]);
           translate([0,0,0])
             cube([fullWidth,fullWidth-h/2,h*2]);
         }
@@ -74,10 +74,12 @@ module laserMount()
       translate([0,w-h/2,h/2])
         rotate([0,90,0])
           cylinder(h=fullWidth,r=pin/2);
+      // Wire channel
       translate([w/2,0,0]) rotate([90,0,0]) cylinder(h=l,r=2);
       translate([w/2,-l,0])
         cylinder(h,r=2);
     }
+    // Wire retaining tabs
     translate([w/2,-10,0]) cube([3,2,1]);
     translate([w/2-3,-(l-20)/4-10,0]) cube([3,2,1]);
     translate([w/2,-l/2]) cube([3,2,1]);
@@ -154,8 +156,21 @@ module sensor()
 {
   translate([0,-(w/4+d2/2),0])
   {
-    rotate([0,0,180]) hinge();
-    translate([0,w/2+d2,0]) hinge();
+    // Hinges for laser arms
+    translate([0,0,h]) rotate([0,0,180]) hinge();
+    translate([0,w/2+d2,h]) hinge();
+    // Adjustor plates for laser arms
+    difference() {
+      translate([-w/2,-w*2,0]) roundedRect([w,w*2.5,h],2);
+      translate([-w/2+4,-w*2+4,0]) cylinder(h,r=2);
+      translate([w/2-4,-w*2+4,0]) cylinder(h,r=2);
+    }
+    difference() {
+      translate([-w/2,d2,0]) roundedRect([w,w*2.5,h],2);
+      translate([-w/2+4,d2+w*2.5-4,0]) cylinder(h,r=2);
+      translate([w/2-4,d2+w*2.5-4,0]) cylinder(h,r=2);
+    }
+    // Hinge for tripod mount
     translate([-d2/2-w/4,d2/2+w/4,0]) rotate([0,0,90]) hinge();
     translate([0,w/4+d2/2,0]) 
       difference()
@@ -218,16 +233,16 @@ module roundedRect(size, radius)
     hull()
     {
         // place 4 circles in the corners, with the given radius
-        translate([(-x/2)+(radius/2), (-y/2)+(radius/2), 0])
+        translate([(radius/2), (radius/2), 0])
         circle(r=radius);
 
-        translate([(x/2)-(radius/2), (-y/2)+(radius/2), 0])
+        translate([x-(radius/2), (radius/2), 0])
         circle(r=radius);
 
-        translate([(-x/2)+(radius/2), (y/2)-(radius/2), 0])
+        translate([(radius/2), y-(radius/2), 0])
         circle(r=radius);
 
-        translate([(x/2)-(radius/2), (y/2)-(radius/2), 0])
+        translate([x-(radius/2), y-(radius/2), 0])
         circle(r=radius);
     }
 }
