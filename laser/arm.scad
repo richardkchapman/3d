@@ -8,7 +8,7 @@ h = 8;
 l = 180;
 pin=4;
 flange = 44;
-etube = 0;
+etube = 10;
 d2 = 65;
 d1 = 55;
 base = 2;
@@ -142,19 +142,22 @@ module hinge(pins=2)
 
 module arca_plate(l,h=10)
 {
-  translate([-38/2,,0,0])
+  // Specs suggest 38mm is the width, as do measurements,
+  // but when I printed at 38mm it came out 1.5mm too narrow to be gripped..
+  width = 38 + 1.5;
+  translate([-width/2,,0,0])
     difference()
     {
-      cube([38,l,h]);
+      cube([width,l,h]);
       union()
       {
         translate([-fudge,-fudge,5])
           prism(l+fudge*2, 5+fudge, 5+fudge);
         translate([-fudge,-fudge,5])
           prism(l+fudge*2, 5+fudge, -5-fudge);
-        translate([38+fudge,-fudge,5])
+        translate([width+fudge,-fudge,5])
           prism(l+fudge*2, -5-fudge, 5+fudge);
-        translate([38+fudge,-fudge,5])
+        translate([width+fudge,-fudge,5])
           prism(l+fudge*2, -5-fudge, -5-fudge);
       }
     }
@@ -209,8 +212,8 @@ module mount()
 }
 
 //  arm();
-sensor();
-//mount();
+//sensor();
+mount();
 
 //Draw a prism based on a 
 //right angled triangle
