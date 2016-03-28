@@ -143,22 +143,22 @@ module hinge(pins=2)
 module arca_plate(l,h=10)
 {
   // Specs suggest 38mm is the width, as do measurements,
-  // but when I printed at 38mm it came out 1.5mm too narrow to be gripped..
-  width = 38 + 1.5;
+  // but when I printed at 38mm it came out too narrow to be gripped..
+  width = 40;
   translate([-width/2,,0,0])
     difference()
     {
       cube([width,l,h]);
       union()
       {
-        translate([-fudge,-fudge,5])
-          prism(l+fudge*2, 5+fudge, 5+fudge);
-        translate([-fudge,-fudge,5])
-          prism(l+fudge*2, 5+fudge, -5-fudge);
-        translate([width+fudge,-fudge,5])
-          prism(l+fudge*2, -5-fudge, 5+fudge);
-        translate([width+fudge,-fudge,5])
-          prism(l+fudge*2, -5-fudge, -5-fudge);
+        translate([-fudge,-fudge,h/2])
+          prism(l+fudge*2, h/2+fudge, h/2+fudge);
+        translate([-fudge,-fudge,h/2])
+          prism(l+fudge*2, h/2+fudge, -h/2-fudge);
+        translate([width+fudge,-fudge,h/2])
+          prism(l+fudge*2, -h/2-fudge, h/2+fudge);
+        translate([width+fudge,-fudge,h/2])
+          prism(l+fudge*2, -h/2-fudge, -h/2-fudge);
       }
     }
 }
@@ -201,7 +201,7 @@ module mount()
   translate([0,0,2*w/3]) rotate([90,0,180]) hinge();
   difference ()
   {
-    arca_plate(flange+etube,10);
+    arca_plate(flange+etube,8);
     linear_extrude(height=30)
       hull()
       {
