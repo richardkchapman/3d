@@ -74,7 +74,15 @@ module laserMount()
       translate([0,w-h/2,h/2])
         rotate([0,90,0])
           cylinder(h=fullWidth,r=pin/2);
+      translate([w/2,0,0]) rotate([90,0,0]) cylinder(h=l,r=2);
+      translate([w/2,-l,0])
+        cylinder(h,r=2);
     }
+    translate([w/2,-10,0]) cube([3,2,1]);
+    translate([w/2-3,-(l-20)/4-10,0]) cube([3,2,1]);
+    translate([w/2,-l/2]) cube([3,2,1]);
+    translate([w/2-3,-3*(l-20)/4-10,0]) cube([3,2,1]);
+    translate([w/2,-l+10,0]) cube([3,2,1]);
     laserMount();
   }
 }
@@ -148,36 +156,38 @@ module sensor()
   {
     rotate([0,0,180]) hinge();
     translate([0,w/2+d2,0]) hinge();
+    translate([-d2/2-w/4,d2/2+w/4,0]) rotate([0,0,90]) hinge();
     translate([0,w/4+d2/2,0]) 
       difference()
       {
-        union()
-        {
-          cylinder(r=d2/2,h=flange+etube);
-          translate([-d2/2-10,0,0])
-            rotate([90,0,90])
-              arca_plate(flange+etube,20);
-        }
-        translate([-d2/2-2.5,0,0])
-          linear_extrude(height=flange+etube+fudge)
-            hull()
-            {
-              translate([0,7,0])
-                circle(r=2.5);
-              translate([0,-7,0])
-                circle(r=2.5);
-            }
+        cylinder(r=d2/2,h=flange+etube);
+        translate([0,0,flange+etube-12]) rotate([0,-90,0]) cylinder(h=100,r=2); // Screw hole
         translate([0,0,base])
-          cylinder(r=d1/2,h=flange+etube+fudge);
+          cylinder(r=d1/2,h=flange+etube+fudge);  // inside
         translate([0,0,-fudge/2])
-          cylinder(r=sensor/2,h=base+fudge);
+          cylinder(r=sensor/2,h=base+fudge);  // sensor hole
       }
   }
 }
 
-//arm();
-sensor();
+module mount()
+{
+  translate([0,0,2*w/3]) rotate([90,0,180]) hinge();
+  difference ()
+  {
+    arca_plate(flange+etube,10);
+    linear_extrude(height=30)
+      hull()
+      {
+        translate([0,10,0]) circle(r=2.5);
+        translate([0,flange+etube-10,0]) circle(r=2.5);
+      }
+  }
+}
 
+arm();
+//sensor();
+//mount();
 
 //Draw a prism based on a 
 //right angled triangle
