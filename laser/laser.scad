@@ -14,46 +14,8 @@ d1 = 55;
 base = 2;
 sensor = 20;  // Make it oversize so we can use ground-glass focussing screen
 fudge = 1;
-hingeTol = 0.2;
-
-module arm()
-{
-    
-module bar() 
-{
-  intersection()
-  {
-    linear_extrude(height=h)
-      hull()
-      {
-        translate([fullWidth/2,-l])
-          circle(r=5);
-        square(size=fullWidth);
-      }
-
-    // This rounds off the hinge end
-    difference()
-    {
-      translate([0,-l-fullWidth,0])
-        cube([fullWidth,l+fullWidth*2,h]);
-      difference()
-      {
-        translate([0,fullWidth-h/2,0])
-          cube([fullWidth,h/2,h]);
-        difference()
-        {
-          translate([0,fullWidth-h/2,h/2])
-            rotate([0,90,0])
-              cylinder(h=fullWidth,r=h/2);
-     //     translate([0,0,0])
-       //     cube([fullWidth,fullWidth,h/2]);
-          translate([0,0,0])
-            cube([fullWidth,fullWidth-h/2,h*2]);
-        }
-      }
-    }
-  }
-}
+hingeTol = 0.2; // tightness of fit
+hingeGap = 2;   // Extra length on arms
 
 module laserMount() 
 {
@@ -65,28 +27,18 @@ module laserMount()
     }
 }
 
+module arm()
+{
   translate([-w/2,-w,0])
   {
-    difference()
-    {
-      bar();
-      // hinge tabs
-      translate([w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
-      translate([3*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
-      translate([0,w-h/2,h/2])
-        rotate([0,90,0])
-          cylinder(h=fullWidth,r=pin/2);
-      // Wire channel
-      translate([w/2,0,0]) rotate([90,0,0]) cylinder(h=l,r=2);
-      translate([w/2,-l,0])
-        cylinder(h,r=2);
-    }
-    // Wire retaining tabs - not worth it
-/*    translate([w/2,-10,0]) cube([3,2,1]);
-    translate([w/2-3,-(l-20)/4-10,0]) cube([3,2,1]);
-    translate([w/2,-l/2]) cube([3,2,1]);
-    translate([w/2-3,-3*(l-20)/4-10,0]) cube([3,2,1]);
-    translate([w/2,-l+10,0]) cube([3,2,1]); */
+    linear_extrude(height=h)
+      hull()
+      {
+        translate([fullWidth/2,-l])
+          circle(r=5);
+        square(size=[fullWidth,1]);
+      }
+    translate([w/2,w/2]) hinge();
     laserMount();
   }
 }
@@ -127,12 +79,12 @@ module hinge(pins=2)
     }
     if (pins==2)
     {
-      translate([0*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
-      translate([2*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
-      translate([4*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+      translate([0*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+      translate([2*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+      translate([4*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
     } else {
-      translate([1*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
-      translate([3*w/5,w-h,0]) cube([w/5+hingeTol,h,h]);
+      translate([1*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+      translate([3*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
     }
     translate([0,w-h/2,h/2])
       rotate([0,90,0])
@@ -144,7 +96,7 @@ module arca_plate(l,h=10)
 {
   // Specs suggest 38mm is the width, as do measurements,
   // but when I printed at 38mm it came out too narrow to be gripped..
-  width = 40;
+  width = 41;
   translate([-width/2,,0,0])
     difference()
     {
@@ -211,7 +163,7 @@ module mount()
   }
 }
 
-//  arm();
+//arm();
 //sensor();
 mount();
 
