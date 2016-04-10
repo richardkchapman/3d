@@ -32,10 +32,20 @@ module single_arca_plate(l=40,h=5)
 }
 
 //single_arca_plate();
+rotate([0,180,0])
 intersection()
 {
-    double_arca_plate(30,10);
-    roundedRect([width,30,10], 3);
+    difference()
+    {
+        union()
+        {
+            single_arca_plate(50,6);
+            translate([0,0,6]) cube([width,50,4]);
+        }
+        translate([width/2,50/2,0]) cylinder(h=10,r=5);
+        translate([width/2,50/2,0]) cylinder(h=8,r=14);
+    }
+    roundedRect([width,50,10], 3);
 }
 
 //Draw a prism based on a 
