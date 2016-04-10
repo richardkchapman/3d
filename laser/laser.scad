@@ -17,9 +17,29 @@ fudge = 1;
 hingeTol = 0.2; // tightness of fit
 hingeGap = 2;   // Extra length on arms
 
+module triPlate(w=fullWidth,holesize=3,c=false)
+{
+    difference()
+    {
+        cylinder(h/2,r=w/2);
+        rotate([0,0,0])
+          translate([0,-w/2+3,0])
+            cylinder(h/2,r=holesize/2);
+        rotate([0,0,-120])
+          translate([0,-w/2+3,0])
+            cylinder(h/2,r=holesize/2);
+        rotate([0,0,120])
+          translate([0,-w/2+3,0])
+            cylinder(h/2,r=holesize/2);
+        if (c)
+          cylinder(h/2,r=1.5);
+    }
+}
+
 module laserMount() 
 {
-  translate([fullWidth/2,-l,h])
+  triPlate(c=true);
+  translate([0,0,h/2])
     difference()
     {
       cylinder(h=20,r=5);
@@ -29,7 +49,20 @@ module laserMount()
 
 module arm()
 {
-  translate([-w/2,-w,0])
+  difference()
+  {
+    linear_extrude(height=h/2)
+      hull()
+      {
+        translate([fullWidth/2,-l])
+          circle(r=5);
+        square(size=[fullWidth,1]);
+      }
+    translate([w/2,-l,0])
+      triPlate();
+  }
+  translate([w/2,w/2]) hinge();
+  intersection()
   {
     linear_extrude(height=h)
       hull()
@@ -38,9 +71,12 @@ module arm()
           circle(r=5);
         square(size=[fullWidth,1]);
       }
-    translate([w/2,w/2]) hinge();
-    laserMount();
+    translate([0,0,h/2])
+      rotate([0,0,-90])
+        prism(w,w,h/2);
   }
+  translate([w/2,-l,0])
+    triPlate(holesize=3.5);
 }
 
 module hinge(pins=2)
@@ -120,19 +156,8 @@ module sensor()
   translate([0,-(w/4+d2/2),0])
   {
     // Hinges for laser arms
-    translate([0,0,h]) rotate([0,0,180]) hinge();
-    translate([0,w/2+d2,h]) hinge();
-    // Adjustor plates for laser arms
-    difference() {
-      translate([-w/2,-w*2,0]) roundedRect([w,w*2.5,h],2);
-      translate([-w/2+4,-w*2+4,0]) cylinder(h,r=2);
-      translate([w/2-4,-w*2+4,0]) cylinder(h,r=2);
-    }
-    difference() {
-      translate([-w/2,d2,0]) roundedRect([w,w*2.5,h],2);
-      translate([-w/2+4,d2+w*2.5-4,0]) cylinder(h,r=2);
-      translate([w/2-4,d2+w*2.5-4,0]) cylinder(h,r=2);
-    }
+    rotate([0,0,180]) hinge();
+    translate([0,w/2+d2,0]) hinge();
     // Hinge for tripod mount
     translate([-d2/2-w/4,d2/2+w/4,0]) rotate([0,0,90]) hinge(pins=3);
     translate([0,w/4+d2/2,0]) 
@@ -163,9 +188,10 @@ module mount()
   }
 }
 
+//laserMount();
 //arm();
-//sensor();
-mount();
+sensor();
+//mount();
 
 //Draw a prism based on a 
 //right angled triangle
