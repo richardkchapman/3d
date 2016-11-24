@@ -43,7 +43,7 @@ intersection()
             translate([0,0,6]) cube([width,50,4]);
         }
         translate([width/2,50/2,0]) cylinder(h=10,r=5);
-        translate([width/2,50/2,0]) cylinder(h=8,r=14);
+        translate([width/2,50/2,0]) cylinder(h=7,r=15);
     }
     roundedRect([width,50,10], 3);
 }

@@ -1,3 +1,5 @@
+include <nutsnbolts/cyl_head_bolt.scad>;
+
 $fn=50;
 
 //roundedRect([10,150,5], 3);
@@ -10,12 +12,16 @@ pin=4;
 flange = 44;
 etube = 10;
 d2 = 65;
-d1 = 55;
+d1 = 56.5;
+holed = 60;  // Diameter of flange mounting holes
+transD = 4.8;  // Diameter of phototransistor
 base = 2;
+sbase = 3;
 sensor = 20;  // Make it oversize so we can use ground-glass focussing screen
 fudge = 1;
 hingeTol = 0.2; // tightness of fit
 hingeGap = 2;   // Extra length on arms
+sensorTol = 0.5; // tightness of fit
 
 module triPlate(w=fullWidth,holesize=3,c=false)
 {
@@ -38,13 +44,21 @@ module triPlate(w=fullWidth,holesize=3,c=false)
 
 module laserMount() 
 {
-  triPlate(c=true);
-  translate([0,0,h/2])
-    difference()
+  difference()
+  {
+    union()
     {
-      cylinder(h=20,r=5);
-      cylinder(h=21,r=3.3);  // Shouldq be 6.5/2 but holes seem to print smaller than you ask
+      triPlate(c=true);
+      translate([0,0,h/2])
+        cylinder(h=27-h/2,r=6);
     }
+    cylinder(h=28,r=4.25);  // Should be 8mm/2 but holes seem to print smaller than you ask
+    //translate([-4.5,-1.25,0])
+      //cube([9,2.5,13]);
+    translate([0,0,21])
+      rotate([90,0,0]) 
+        cylinder(h=10,r=1.5);
+  }
 }
 
 module arm()
@@ -61,7 +75,14 @@ module arm()
     translate([w/2,-l,0])
       triPlate();
   }
-  translate([w/2,w/2]) hinge();
+  translate([w/2,w/2]) hinge(pins=3);
+  translate([w/2-w/10,-l+w])
+  {
+    cube([w/5,l-w,h]);
+    translate([0,0,h/2])
+      rotate([0,0,-90])
+        prism(w/5,w/2,h/2);
+  }
   intersection()
   {
     linear_extrude(height=h)
@@ -81,50 +102,66 @@ module arm()
 
 module hinge(pins=2)
 {
-  translate([-w/2,-w/2,0]) difference()
+  translate([-w/2,-w/2,0]) 
   {
     intersection()
     {
-      linear_extrude(height=h)
-        hull()
+      union()
+      {
+        difference()
         {
-          square(size=fullWidth);
+          linear_extrude(height=h)
+            hull()
+            {
+              square(size=fullWidth);
+            }
+          if (pins==2)
+          {
+            translate([0*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+            translate([2*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+            translate([4*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+          } else {
+            translate([1*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+            translate([3*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
+          }
+          translate([0,w-h/2,h/2])
+            rotate([0,90,0])
+              cylinder(h=fullWidth,r=pin/2);
         }
-
+        if (false)  // if (pins==3) - nut trap, didn't really work
+        {
+          difference()
+          {
+            translate([w,w/2,0])
+              cube([6,w/2,h]);
+            translate([w,w-h/2,h/2])
+              rotate([0,-90,0])
+                nutcatch_sidecut("M4", l=10, clk=0.1, clh=0.1, clsl=0.1);
+          }
+        }
+      }
       // This rounds off the hinge end
       difference()
       {
         translate([0,-l-fullWidth,0])
-          cube([fullWidth,l+fullWidth*2,h]);
+          cube([fullWidth+6,l+fullWidth*2,h]);
         difference()
         {
           translate([0,fullWidth-h/2,h/2])
-            cube([fullWidth,h/2,h/2]);
+            cube([fullWidth+6,h/2,h/2]);
           difference()
           {
             translate([0,fullWidth-h/2,h/2])
               rotate([0,90,0])
-                cylinder(h=fullWidth,r=h/2);
+                cylinder(h=fullWidth+6,r=h/2);
             translate([0,0,0])
-              cube([fullWidth,fullWidth,h/2]);
+              cube([fullWidth+6,fullWidth,h/2]);
             translate([0,0,0])
-              cube([fullWidth,fullWidth-h/2,h*2]);
+              cube([fullWidth+6,fullWidth-h/2,h*2]);
           }
         }
       }
     }
-    if (pins==2)
-    {
-      translate([0*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
-      translate([2*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
-      translate([4*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
-    } else {
-      translate([1*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
-      translate([3*w/5,w-h-hingeGap,0]) cube([w/5+hingeTol,h+hingeGap,h]);
-    }
-    translate([0,w-h/2,h/2])
-      rotate([0,90,0])
-        cylinder(h=fullWidth,r=pin/2);
   }
 }
 
@@ -169,7 +206,97 @@ module sensor()
           cylinder(r=d1/2,h=flange+etube+fudge);  // inside
         translate([0,0,-fudge/2])
           cylinder(r=sensor/2,h=base+fudge);  // sensor hole
+        // Screw holes
+        rotate([0,0,45])
+        {
+          translate([0,holed/2,flange+etube-5])
+            cylinder(r=0.5,h=5);  // screw holes
+          translate([0,-holed/2,flange+etube-5])
+            cylinder(r=0.5,h=5);  // screw holes
+          translate([holed/2,0,flange+etube-5])
+            cylinder(r=0.5,h=5);  // screw holes
+          translate([-holed/2,0,flange+etube-5])
+            cylinder(r=0.5,h=5);  // screw holes
+        }
       }
+  }
+}
+
+studDiameter=5;
+studClearance=0.1;
+studHeight=sbase;
+
+module stud_pin()
+{
+  difference()
+  {
+    union()
+    {
+      cylinder(r=studDiameter/2 - studClearance, h=studHeight);
+      translate([0,0,studHeight*0.75]) 
+        cylinder(h=studHeight*0.25, r2=studDiameter/2 - studClearance, r=studDiameter/2 + 0.25);
+    }
+    translate([0,0,studHeight*5/6]) cube([1.5,8,studHeight],true);
+  }
+}
+
+module stud_hole()
+{
+    union()
+    {
+      cylinder(r=studDiameter/2,h=studHeight);
+      translate([0,0,studHeight/2]) 
+        cylinder(r=studDiameter/2 +1,h=studHeight);
+    }
+}
+
+module subsensor()
+{
+  difference()
+  {
+    union()
+    {
+      translate([0,0,sbase]) cylinder(r=sensor/2-sensorTol,h=base);  // sensor hole
+      cylinder(r=d2/2,h=sbase);  // sensor hole
+      translate([-w/2,-(d2+15)/2,0]) cube([w,d2+15,sbase]);
+    }
+    translate([-3,-3,0])
+      cube([6,6,base+sbase]);
+    translate([15,15,0])
+      stud_hole();
+    translate([15,-15,0])
+      stud_hole();
+    translate([-15,15,0])
+      stud_hole();
+    translate([-15,-15,0])
+      stud_hole();
+  }
+}
+
+module subsensor_cap()
+{
+  union()
+  {
+    translate([-20,-20,0])
+      cube([40,40,sbase]);
+    translate([0,0,sbase])
+    {
+      translate([-20,-20,0])
+        cube([12.5,40,8]);
+      translate([7.5,-20,0])
+        cube([12.5,40,8]);
+    }
+    translate([0,0,sbase+8])
+    {
+      translate([15,15,0])
+        stud_pin();
+      translate([15,-15,0])
+        stud_pin();
+      translate([-15,15,0])
+        stud_pin();
+      translate([-15,-15,0])
+        stud_pin();
+    }
   }
 }
 
@@ -188,9 +315,11 @@ module mount()
   }
 }
 
-//laserMount();
+laserMount();
 //arm();
-sensor();
+//sensor();
+//subsensor();
+//subsensor_cap();
 //mount();
 
 //Draw a prism based on a 
