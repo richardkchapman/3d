@@ -4,9 +4,9 @@ translate([55,-21,0])
 
 import("/Users/rchapman/Downloads/hoodvent.stl");
 */
-x = 108;  // width of opening we are blocking
-y = 100;  // height of opening we are blocking
-r = 30;   // radius of curves
+x = 109;  // width of opening we are blocking
+y = 101;  // height of opening we are blocking
+r = 45;   // radius of curves
 z1 = 2;   // thickness of overlap
 ac = 3;   // thickness of acrylic
 
