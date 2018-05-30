@@ -12,6 +12,26 @@ mountingHoleRadius = 3.2 / 2;
 bl = 68.6;
 bw = 53.5;
 
+module base() 
+{
+  union() //   
+   difference()
+  {
+    translate([0, 0, -9]) 
+    	enclosure(wall=2.5,standOffHeight=2, heightExtension = 15, offset=3, mountType=PIN);
+    translate([30,0,13])
+      rotate([90,0,0]) cylinder(r=5,h=10, $fn=20);
+    translate([7,15,11])
+      cube([7.5,100,70]);
+    translate([32,15,11])
+      cube([13,100,70]);
+  //    cube([100,100,100]);
+    
+  }
+}
+
+module lid() 
+{
   difference()
   {
 //    translate([0, 0, -8]) 
@@ -24,9 +44,14 @@ bw = 53.5;
     difference()
     {
     	color("red")
-        enclosureLid();
-//   		translate([0,0,-2]) holePlacement(boardType = UNO)
-//  			color("SteelBlue") cylinder(r = mountingHoleRadius, h = 2+3.01, $fn=32);
+        union()
+        {
+          enclosureLid(wall=2.5);
+          translate([7.5,dimensions[1]-3.5,-6])
+            cube([5,2.5,6]);
+          translate([32.5,dimensions[1]-3.5,-6])
+            cube([11,2.5,6]);
+        }
       translate([-bw/100,-bl/100,-2]) 
         scale([1.02,1.02,1])
           boardShape(UNO);
@@ -51,4 +76,10 @@ bw = 53.5;
           cube([29,37.5,7]);
       }
     }
+  }
 }
+
+base();
+//rotate([0,180,0])
+//translate([0,0,23])
+  //lid();

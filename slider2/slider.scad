@@ -23,87 +23,11 @@ endPlateLength = rodCenters + rodDiameter + 4;
 endPlateHeight = rodDiameter + 4;
 
 NemaSideSize = 43.5;   // Allow a bit of tolerance
-footLength = 22;
+//footLength = 44;
 footHeight = 5;
 footWidth = NemaSideSize;
 switchPlateWidth = 13;
-footHoleSpacing = 30;
-
-module endPlate()
-{
-  bearingDiameter = 22;
-  pinchHoleY = (rodCenters-rodDiameter-bearingDiameter)/4+bearingDiameter/2;
-  difference()
-  {
-    // Bar with circular ends
-    union()
-    {
-      // Bar with circular ends
-      cube([endPlateThickness, rodCenters, endPlateHeight],center=true);
-      translate([-endPlateThickness/2,rodCenters/2,0])
-        rotate([0,90,0])
-          cylinder(r=endPlateHeight/2,h=endPlateThickness);
-      translate([-endPlateThickness/2,-rodCenters/2,0])
-        rotate([0,90,0])
-          cylinder(r=endPlateHeight/2,h=endPlateThickness);
-      // Bearing holder
-      translate([-endPlateThickness/2,0,0])
-        rotate([0,90,0])
-          cylinder(r=bearingDiameter/2+2,h=endPlateThickness);
-      // foot
-      translate([-endPlateThickness/2,-footWidth/2,-NemaSideSize/2])
-        cube([endPlateThickness, footWidth, NemaSideSize/2]);
-      translate([-endPlateThickness/2,-footWidth/2,-NemaSideSize/2])
-        roundedRect([footLength, footWidth, footHeight],2);
-    }
-    // Holes for rods
-    union()
-    {
-      translate([-endPlateThickness/2,rodCenters/2,0])
-        rotate([0,90,0])
-          cylinder(r=rodDiameter/2,h=endPlateThickness);
-      translate([-endPlateThickness/2,-rodCenters/2,0])
-        rotate([0,90,0])
-          cylinder(r=rodDiameter/2,h=endPlateThickness);
-    }
-    // Hole for bearing
-    translate([-endPlateThickness/2,,0])
-      rotate([0,90,0])
-        cylinder(r=bearingDiameter/2,h=endPlateThickness);
-    // Pinch slot
-    cube([endPlateThickness, rodCenters, 2],center=true);
-    // pinch holes
-    translate([0,pinchHoleY,-endPlateHeight/2])
-    {
-      nutHole(4);
-      translate([0,-3.5,-1])
-        cube([endPlateThickness/2+1,7,4]);
-    }
-    translate([0,pinchHoleY,-endPlateHeight/2])
-      cylinder(r=2,h=endPlateHeight);
-    translate([0,pinchHoleY,endPlateHeight/2-3])
-      cylinder(r=3.5,h=3);
-    translate([0,-pinchHoleY,-endPlateHeight/2])
-    {
-      nutHole(4);
-      translate([0,-3.5,-1])
-        cube([endPlateThickness/2+1,7,4]);
-    }
-    translate([0,-pinchHoleY,-endPlateHeight/2])
-      cylinder(r=2,h=endPlateHeight);
-    translate([0,-pinchHoleY,endPlateHeight/2-3])
-      cylinder(r=3.5,h=3);
-    // Foot mounting holes
-    csk_plate = false;
-    translate([endPlateThickness/2+6,0,-NemaSideSize/2])
-      csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
-/*    translate([footLength-endPlateThickness/2-6,footHoleSpacing/2,-NemaSideSize/2])
-      csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
-    translate([footLength-endPlateThickness/2-6,-footHoleSpacing/2,-NemaSideSize/2])
-      csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
-  */
-  }
-}
+footHoleSpacing = 20;
 
 module motorPlate(isMotor=true)
 {
@@ -112,6 +36,7 @@ module motorPlate(isMotor=true)
   NemaRoundExtrusionDiameter = 24;  // 22 in theory but give some clearance
   BearingDiameter = 22;
   pinchHoleY = rodCenters/2+rodDiameter/2+3;
+  footLength = isMotor ? 30 : 45;
   difference()
   {
     // Bar with circular ends
@@ -129,16 +54,21 @@ module motorPlate(isMotor=true)
         rotate([0,90,0])
           cylinder(r=endPlateHeight/2,h=endPlateThickness);
       // Motor holder
-      translate([endPlateThickness/2,-NemaSideSize/2,-NemaSideSize/2])
-        rotate([0,-90,0])
-          roundedRect([NemaSideSize, NemaSideSize, endPlateThickness],2)
+      if (isMotor)
+        translate([endPlateThickness/2,-NemaSideSize/2,-NemaSideSize/2])
+          rotate([0,-90,0])
+            roundedRect([NemaSideSize, NemaSideSize, endPlateThickness],2);
+      else
+        translate([endPlateThickness/2,-NemaSideSize/2,-NemaSideSize/2])
+          rotate([0,-90,0])
+            roundedRect([NemaSideSize, NemaSideSize, endPlateThickness],2);
       // foot
       translate([-endPlateThickness/2,-footWidth/2,-NemaSideSize/2])
         cube([endPlateThickness, footWidth, NemaSideSize/2]);
       translate([-endPlateThickness/2,-footWidth/2,-NemaSideSize/2])
-        roundedRect([footLength, footWidth, footHeight],2);
+        roundedRect([footLength+endPlateThickness, footWidth, footHeight],2);
       translate([-endPlateThickness/2,-(rodCenters+switchPlateWidth)/2,-NemaSideSize/2])
-        roundedRect([footLength, switchPlateWidth+10, footHeight],2); // 10 is a fudge to merge into foot...
+        roundedRect([endPlateThickness+4, switchPlateWidth+10, footHeight],2); // 10 is a fudge to merge into foot...
     }
     // Holes for rods
     union()
@@ -184,28 +114,28 @@ module motorPlate(isMotor=true)
         {
           cylinder(r=NemaMountingHoleDiameter/2,h=endPlateThickness);
           translate([0,0,endPlateThickness])
-            cylinder(r=3.2,h=10);
+            cylinder(r=3.2,h=footLength);
         }
       translate([-endPlateThickness/2,-holeOffset,holeOffset])
         rotate([0,90,0])
         {
           cylinder(r=NemaMountingHoleDiameter/2,h=endPlateThickness);
           translate([0,0,endPlateThickness])
-            cylinder(r=3.2,h=10);
+            cylinder(r=3.2,h=footLength);
         }
       translate([-endPlateThickness/2,holeOffset,-holeOffset])
         rotate([0,90,0])
         {
           cylinder(r=NemaMountingHoleDiameter/2,h=endPlateThickness);
           translate([0,0,endPlateThickness])
-            cylinder(r=3.2,h=10);
+            cylinder(r=3.2,h=footLength);
         }
       translate([-endPlateThickness/2,-holeOffset,-holeOffset])
         rotate([0,90,0])
         {
           cylinder(r=NemaMountingHoleDiameter/2,h=endPlateThickness);
           translate([0,0,endPlateThickness])
-            cylinder(r=3.2,h=10);
+            cylinder(r=3.2,h=footLength);
         }
     }
     else
@@ -224,20 +154,31 @@ module motorPlate(isMotor=true)
     }
     // Foot mounting holes
     csk_plate=false;
-    translate([endPlateThickness/2+6,0,-NemaSideSize/2])
+    translate([endPlateThickness/2+footLength-6,0,-NemaSideSize/2])
+    {
       csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
-    translate([footLength-endPlateThickness/2-4,-rodCenters/2-3,-NemaSideSize/2])
+      translate([0,0,endPlateThickness/4])nutHole(5);
+    }
+    if (!isMotor)
+    {
+      translate([endPlateThickness/2+7,footHoleSpacing/2,-NemaSideSize/2])
+      {
+        csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
+        translate([0,0,endPlateThickness/4])nutHole(5);
+      }
+      translate([endPlateThickness/2+7,-footHoleSpacing/2,-NemaSideSize/2])
+      {
+        csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
+        translate([0,0,endPlateThickness/4])nutHole(5);
+      }
+    }
+    // Limit switch mounting holes
+    translate([endPlateThickness/2,-rodCenters/2-3,-NemaSideSize/2])
       rotate([0,180,0]) translate([0,0,-footHeight])
         csk_bolt(M25HoleRadius*2,footHeight,true);
-    translate([footLength-endPlateThickness/2-4,-rodCenters/2+3,-NemaSideSize/2])
+    translate([endPlateThickness/2,-rodCenters/2+3,-NemaSideSize/2])
       rotate([0,180,0]) translate([0,0,-footHeight])
         csk_bolt(M25HoleRadius*2,footHeight,true);
-    /*
-    translate([footLength-endPlateThickness/2-6,footHoleSpacing/2,-NemaSideSize/2])
-      csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
-    translate([footLength-endPlateThickness/2-6,-footHoleSpacing/2,-NemaSideSize/2])
-      csk_bolt(M5HoleRadius*2,footHeight,csk_plate);
-    */
   }
 }
 
