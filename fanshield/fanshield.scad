@@ -24,6 +24,7 @@ shh = 20;  // side cable arch height
 shw = 8;   // side cable arch width
 shr = 3;   // side cable arch curve radius
 
+trimbase = 0;  // amount to trim off base = print one at 3mm and one at 0mm
 delta = 1;
 
 module arch(x,y,z,r)
@@ -62,5 +63,7 @@ difference()
       arch(shw,shh+delta,z1+z2+delta,shr);
     translate([o+3*x/4-shw/2, -delta, -delta/2])
       arch(shw,shh+delta,z1+z2+delta,shr);
-
+    translate([-delta,-delta,-delta/2])
+      cube([x+delta*2+o*2, trimbase+delta, z1+z2+delta]);
 }
+
