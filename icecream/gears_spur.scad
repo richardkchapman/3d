@@ -54,8 +54,12 @@ romeAngle=5; //rotate top gear (angle)
 
 //----------------------
 
-gear();
-
+union()
+{
+  gear();
+  translate([0,0,gearHeight])
+  cylinder(d=6, h=14-gearHeight);
+}  
 //----------------------
 
 //TOOTH
